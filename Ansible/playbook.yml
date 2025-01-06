@@ -39,9 +39,9 @@
         enabled: true
 
     # Install Java
-    - name: Install OpenJDK 11
+    - name: Install OpenJDK 17
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jdk
         state: present
 
     # Install Jenkins
