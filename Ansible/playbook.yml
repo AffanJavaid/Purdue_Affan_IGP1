@@ -1,0 +1,85 @@
+---
+- name: Install Docker, Jenkins, and Java
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Update apt repository cache
+      apt:
+        update_cache: yes
+
+    # Install dependencies
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    # Install Docker
+    - name: Add Docker GPG key
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Enable and start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    # Install Java
+    - name: Install OpenJDK 11
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    # Install Jenkins
+    - name: Add Jenkins GPG key
+      shell: |
+        curl -fsSL https://pkg.jenkins.io/debian/jenkins.io.key | apt-key add -
+
+    - name: Add Jenkins APT repository
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian binary/
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Enable and start Jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: true
+
+    # Verify installation
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+    - debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
+
+    - name: Verify Java installation
+      command: java -version
+      register: java_version
+      ignore_errors: true
+    - debug:
+        msg: "Java version: {{ java_version.stderr }}"
+
+    - name: Verify Jenkins status
+      service_facts:
+    - debug:
+        msg: "Jenkins is {{ ansible_facts.services['jenkins.service'].state }}"
