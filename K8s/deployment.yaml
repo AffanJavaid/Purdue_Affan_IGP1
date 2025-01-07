@@ -17,5 +17,6 @@ spec:
       containers:
       - name: affan
         image: affanjavaid/my-tomcat-app:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080

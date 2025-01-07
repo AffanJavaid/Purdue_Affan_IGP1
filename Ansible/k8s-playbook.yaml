@@ -1,0 +1,34 @@
+---
+- name: Apply Kubernetes Deployment
+  hosts: master
+  become: true
+
+  vars:
+    deployment_file: "k8s/deployment.yaml" # Replace with the actual path
+
+  tasks:
+    - name: Check if kubectl is installed
+      command: kubectl version --client=true
+      register: kubectl_check
+      failed_when: "'Client Version' not in kubectl_check.stdout"
+      ignore_errors: false
+
+    - name: Apply Kubernetes deployment
+      command: kubectl apply -f {{ deployment_file }}
+      register: kubectl_apply
+      failed_when: kubectl_apply.rc != 0
+      ignore_errors: false
+
+    - name: Debug deployment output
+      debug:
+        var: kubectl_apply.stdout
+
+    - name: Validate deployment status
+      command: kubectl rollout status -f {{ deployment_file }}
+      register: rollout_status
+      failed_when: "'successfully rolled out' not in rollout_status.stdout"
+      ignore_errors: false
+
+    - name: Debug rollout output
+      debug:
+        var: rollout_status.stdout

@@ -1,0 +1,12 @@
+- hosts: localhost
+
+  tasks:
+
+    - name: ensure a container is running
+      docker_container:
+        name: tomcat-app
+        state: started
+        image: "affanjavaid/my-tomcat-app:latest"
+        pull: true
+        ports:
+          - "8080:8080"
