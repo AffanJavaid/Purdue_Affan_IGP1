@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: affan-deployment
+  labels:
+    app: affan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: affan
+  template:
+    metadata:
+      labels:
+        app: affan
+    spec:
+      containers:
+      - name: affan
+        image: affanjavaid/my-tomcat-app:latest
+        ports:
+        - containerPort: 8080
